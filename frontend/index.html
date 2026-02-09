@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Human Motion Detection — Live</title>
+    <style>
+      body { font-family: Arial, sans-serif; text-align:center; padding:20px }
+      #frame { max-width: 100%; height: auto; border: 1px solid #ddd }
+      #status { margin-top: 12px }
+    </style>
+  </head>
+  <body>
+    <h1>Human Motion Detection — Live</h1>
+    <img id="frame" src="/api/frame" alt="live frame" />
+    <div id="status">Connecting...</div>
+
+    <script>
+      const backendOrigin = location.origin.replace(/:\d+$/, ':8000'); // assume backend runs on port 8000
+      const img = document.getElementById('frame');
+      const status = document.getElementById('status');
+
+      function refresh() {
+        img.src = backendOrigin + '/frame?ts=' + Date.now();
+        fetch(backendOrigin + '/status').then(r=>r.json()).then(j=>{
+          status.textContent = `FPS: ${j.fps || '...' } | Frames: ${j.frame_count || '...'} | Detected: ${j.total_detected || '...'}`
+        }).catch(()=>{ status.textContent = 'Backend not reachable' });
+      }
+
+      setInterval(refresh, 500);
+      refresh();
+    </script>
+  </body>
+</html>

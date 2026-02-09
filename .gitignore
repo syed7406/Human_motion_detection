@@ -1,0 +1,28 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+*.egg
+.env
+.env.*
+# Virtual environments
+.venv/
+.venv311/
+venv/
+.Python
+# OS files
+.DS_Store
+# Logs and output
+*.log
+data/
+output_video.avi
+hmd.log
+hmd.err
+# Model weights and large binaries
+models/
+*.pt
+yolov8n-pose.pt
+yolov8n.pt
+# IDEs
+.vscode/
+.idea/

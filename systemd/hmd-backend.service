@@ -1,0 +1,14 @@
+[Unit]
+Description=Human Motion Detection Backend
+After=network.target
+
+[Service]
+User=ubuntu
+WorkingDirectory=/home/ubuntu/human_motion_detection
+ExecStart=/home/ubuntu/human_motion_detection/.venv311/bin/uvicorn backend.api_server:app --host 0.0.0.0 --port 8000
+Restart=always
+RestartSec=5
+Environment=PYTHONUNBUFFERED=1
+
+[Install]
+WantedBy=multi-user.target
