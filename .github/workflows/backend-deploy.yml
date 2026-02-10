@@ -1,0 +1,31 @@
+name: Deploy Backend to VM via SSH
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy-backend:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Deploy to VM (SSH)
+        uses: appleboy/ssh-action@v0.1.7
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          port: ${{ secrets.DEPLOY_SSH_PORT || '22' }}
+          script: |
+            set -e
+            cd ~
+            if [ -d Human_motion_detection ]; then
+              cd Human_motion_detection && git fetch --all && git reset --hard origin/main
+            else
+              git clone https://github.com/${{ github.repository }} Human_motion_detection
+              cd Human_motion_detection
+            fi
+            chmod +x deploy_vm.sh || true
+            ./deploy_vm.sh
