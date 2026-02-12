@@ -51,6 +51,7 @@
         transition: transform 0.3s ease;
         display: block;
         margin: 0 auto;
+        background-color: #f0f0f0;
       }
 
       #frame:hover {
@@ -87,12 +88,12 @@
 
       /* Error State */
       .error {
-        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%) !important;
       }
 
       /* Success State */
       .success {
-        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%) !important;
       }
 
       /* Info Panel */
@@ -125,6 +126,22 @@
         font-weight: bold;
       }
 
+      /* Loading Skeleton */
+      .skeleton {
+        background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+        background-size: 200% 100%;
+        animation: loading 1.5s infinite;
+      }
+
+      @keyframes loading {
+        0% {
+          background-position: 200% 0;
+        }
+        100% {
+          background-position: -200% 0;
+        }
+      }
+
       /* Responsive Design */
       @media (max-width: 768px) {
         h1 {
@@ -154,28 +171,29 @@
       <!-- Live Video Feed -->
       <img 
         id="frame" 
-        src="/api/frame" 
+        src="" 
         alt="Live detection feed"
         onerror="handleImageError()"
+        class="skeleton"
       />
       
       <!-- Status Bar -->
       <div id="status" class="loading">
-        Connecting to backend...
+        🔄 Connecting to backend...
       </div>
 
       <!-- Info Panel -->
       <div class="info-panel">
         <div class="info-card">
-          <h3>Frame Rate</h3>
+          <h3>📊 Frame Rate</h3>
           <p id="fps-display">--</p>
         </div>
         <div class="info-card">
-          <h3>Total Frames</h3>
+          <h3>🎬 Total Frames</h3>
           <p id="frames-display">--</p>
         </div>
         <div class="info-card">
-          <h3>Humans Detected</h3>
+          <h3>👥 Humans Detected</h3>
           <p id="detected-display">--</p>
         </div>
       </div>
@@ -189,14 +207,19 @@
 
       // Configuration
       const CONFIG = {
-        // Backend API base URL (adjust port if needed)
-        backendOrigin: location.origin.replace(/:\d+$/, ':8000'),
+        // Backend API base URL
+        // For development: http://localhost:8000
+        // For production: https://your-domain.com
+        backendOrigin: getBackendOrigin(),
         
         // Refresh interval in milliseconds (500ms = 2Hz)
         refreshInterval: 500,
         
         // Connection timeout in milliseconds
-        fetchTimeout: 5000
+        fetchTimeout: 5000,
+        
+        // Max connection attempts before showing error
+        maxRetries: 5
       };
 
       // DOM Elements
@@ -211,6 +234,21 @@
       // State
       let connectionAttempts = 0;
       let isConnected = false;
+
+      /**
+       * Get backend origin based on environment
+       * @returns {string} Backend API origin URL
+       */
+      function getBackendOrigin() {
+        // Check if backend is specified in URL hash
+        if (window.location.hash) {
+          return window.location.hash.substring(1);
+        }
+        
+        // For same-origin requests (frontend and backend on same
+        // domain), use the current origin
+        return location.origin.replace(/:\d+$/, ':8000');
+      }
 
       /**
        * Fetch with timeout
